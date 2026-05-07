@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <!-- Кодировка символов -->
+    <meta charset="UTF-8" />
+    <!-- Адаптивная вёрстка -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Заголовок вкладки -->
+    <title>Chat App</title>
+    <!-- Подключение Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<!-- Тело страницы: тёмный фон, высота на весь экран, flex-контейнер, скрытие переполнения -->
+<body class="bg-[#313338] h-screen flex overflow-hidden">
+
+    <!-- Боковая панель -->
+    <aside class="w-60 bg-[#2b2d31] flex flex-col shrink-0">
+        <!-- Заголовок панели -->
+        <div class="px-4 py-3 border-b border-[#1e1f22] flex items-center justify-between">
+            <!-- Название раздела -->
+            <span class="text-white font-semibold text-sm">Комнаты</span>
+            <!-- Кнопка создания новой комнаты -->
+            <button id="btn-create-room" title="Создать комнату"
+            class="text-[#949ba4] hover:text-white text-xl leading-none transition-colors">+</button>
+        </div>
+        
+        <!-- Список комнат -->
+        <ul id="rooms-list" class="flex-1 overflow-y-auto py-2 flex flex-col gap-0.5 px-2">
+            <!-- Комнаты будут добавлены динамически через JavaScript -->
+        </ul>
+        
+        <!-- Нижняя панель с информацией о пользователе -->
+        <div class="px-4 py-3 border-t border-[#1e1f22] flex items-center justify-between gap-2">
+            <!-- Блок с аватаром и именем пользователя -->
+            <div class="flex items-center gap-2 min-w-0">
+                <!-- Аватар: круглый, синий фон, белая буква -->
+                <div class="w-8 h-8 rounded-full bg-[#5865f2] flex items-center justify-center text-white text-sm font-bold shrink-0">
+                    <span id="user-avatar">?</span>
+                </div>
+                <!-- Имя пользователя: белый текст, обрезается с многоточием при переполнении -->
+                <span id="user-name" class="text-white text-sm truncate">Загрузка...</span>
+            </div>
+            <!-- Кнопка выхода из системы -->
+            <button id="btn-logout" title="Выйти"
+            class="text-[#949ba4] hover:text-red-400 transition-colors text-sm shrink-0">⏻</button>
+        </div>
+
+    </aside>
+    <!-- Основная область чата: занимает оставшееся пространство, вертикальный flex -->
+    <main class="flex-1 flex flex-col min-w-0">
+
+      <!-- Верхняя панель с информацией о выбранной комнате -->
+      <header class="h-12 bg-[#313338] border-b border-[#1e1f22] flex items-center px-4 gap-2 shrink-0">
+          <!-- Иконка-разделитель -->
+          <span class="text-[#949ba4] text-lg">#</span>
+          <!-- Название текущей комнаты (обновляется через JS) -->
+          <span id="room-name" class="text-white font-semibold text-sm">Выберите комнату</span>
+          <!-- Блок с кнопками справа -->
+            <div class="ml-auto flex items-center gap-3">
+              <!-- Кнопка "Покинуть комнату"  -->
+              <button id="btn-leave-room" class="hidden text-[#949ba4] hover:text-red-400 text-xs transition-colors">
+               Покинуть
+            </button>
+        </div>
+    </header>
+
+    <!-- Область для отображения сообщений -->
+    <div id="messages-area" class="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3">
+        <!-- Заглушка: комната не выбрана -->
+        <div id="empty-state" class="m-auto flex flex-col items-center gap-2 text-center">
+            <p class="text-[#949ba4] text-sm">Выберите комнату чтобы начать общение</p>
+        </div>
+        <!-- Заглушка: не присоединён к комнате -->
+        <div id="join-state" class="hidden m-auto flex flex-col items-center gap-4 text-center">
+            <!-- Название комнаты, к которой можно присоединиться -->
+            <p class="text-white font-semibold text-lg"># <span id="join-room-name"></span></p>
+            <p class="text-[#949ba4] text-sm">Присоединитесь чтобы читать сообщения и общаться</p>
+            <!-- Кнопка присоединения к комнате -->
+            <button id="btn-join-room" class="bg-[#5865f2] hover:bg-[#4752c4] text-white font-semibold px-6 py-2 rounded transition-colors">Присоединиться</button>
+        </div>
+    </div>
+
+    <!-- Нижняя панель для ввода сообщений -->
+    <div class="px-4 py-4 shrink-0">
+        <div class="bg-[#383a40] rounded-lg flex items-center gap-2 px-4 py-3">
+            <!-- Поле ввода сообщения (заблокировано по умолчанию) -->
+            <input id="message-input" type="text" placeholder="Сообщение недоступно – выберите комнату" disabled 
+            class="flex-1 bg-transparent text-white text-sm outline-none placeholder-[#949ba4] disabled:cursor-not-allowed" />
+            <!-- Кнопка отправки сообщения (заблокирована по умолчанию) -->
+            <button id="btn-send" disabled 
+            class="text-[#949ba4] hover:text-white disabled:cursor-not-allowed transition-colors">
+            ➤
+            </button>
+        </div>
+    </div>
+</main>
+<!-- Боковая панель со списком участников комнаты -->
+<aside class="w-56 bg-[#2b2d31] flex flex-col shrink-0">
+    <!-- Заголовок панели участников -->
+    <div class="px-4 py-3 border-b border-[#1e1f22]">
+        <span class="text-[#949ba4] text-xs font-semibold uppercase tracking-wide">Участники</span>
+    </div>
+
+    <!-- Список участников: скроллируемый, с отступами -->
+    <ul id="members-list" class="flex-1 overflow-y-auto py-2 flex flex-col gap-0.5 px-2">
+        <!-- Участники будут добавлены динамически через JavaScript -->
+    </ul>
+
+</aside>
+
+<!-- Модальное окно для создания комнаты -->
+<div id="modal-create-room" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <!-- Контейнер модального окна -->
+    <div class="bg-[#2b2d31] rounded-lg p-6 w-full max-w-sm shadow-xl">
+        <!-- Заголовок окна -->
+        <h2 class="text-white font-bold text-lg mb-4">Создать комнату</h2>
+        <!-- Поле для ввода названия комнаты -->
+        <input id="input-room-name" type="text" placeholder="Название комнаты"
+        class="w-full bg-[#1e1f22] text-white rounded px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#5865f2] mb-4" />
+        <!-- Блок для вывода ошибок валидации -->
+        <p id="room-error" class="text-red-400 text-xs mb-3 hidden"></p>
+        <!-- Кнопки действий -->
+        <div class="flex gap-2 justify-end">
+            <!-- Кнопка отмены создания комнаты -->
+            <button id="btn-cancel-room" 
+              class="text-[#949ba4] hover:text-white text-sm px-4 py-2 transition-colors">Отмена</button>
+              <!-- Кнопка подтверждения создания комнаты -->
+            <button id="btn-confirm-room" 
+              class="bg-[#5865f2] hover:bg-[#4752c4] text-white text-sm font-semibold px-4 py-2 rounded transition-colors">Создать</button>
+        </div>
+    </div>
+</div>
+
+  <!-- Подключение клиентской библиотеки Socket.IO -->
+  <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+  <!-- Модуль для HTTP-запросов к API -->
+  <script src="/js/api.js"></script>
+  <!-- Модуль для обновления пользовательского интерфейса -->
+  <script src="/js/ui.js"></script>
+  <!-- Модуль для работы с WebSocket-соединением -->
+  <script src="/js/socket-client.js"></script>
+  <!-- Главный модуль, связывающий все компоненты -->
+  <script src="/js/main.js"></script>
+</body>
+
+</html>

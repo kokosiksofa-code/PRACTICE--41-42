@@ -1,0 +1,90 @@
+<!-- Объявление типа документа и язык страницы -->
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <!-- Кодировка символов (UTF-8 для поддержки кириллицы и спецсимволов) -->
+    <meta charset="UTF-8" />
+    <!-- Адаптивная вёрстка: масштабирование под ширину устройства -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Заголовок вкладки браузера -->
+    <title>Chat App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Пользовательские стили для переключения вкладок -->
+    <style>
+        .tab-active { background-color: #5865f2; color: white; }
+        .tab-inactive { color: #949ba4; }
+    </style>
+</head>
+
+<!-- Тело страницы с тёмным фоном, минимальной высотой на весь экран и центрированием содержимого -->
+<body class="bg-[#313338] min-h-screen flex items-center justify-center">
+
+    <!--тёмный фон, скруглённые углы, отступы, максимальная ширина, тень -->
+    <div class="bg-[#2b2d31] rounded-lg p-8 w-full max-w-md shadow-xl">
+        <!-- Заголовок приложения: белый текст, крупный шрифт, жирный, по центру -->
+        <h1 class="text-white text-2xl font-bold text-center mb-6">Chat App</h1>
+        
+        <!-- переключатель вкладок Вход/Регистрация -->
+         <div class="flex bg-[#1e1f22] rounded-md p-1 mb-6">
+         <!-- Кнопка "Войти" -->
+            <button id="tab-login"
+              class="flex-1 py-2 rounded text-sm font-medium transition-colors tab-active">
+              Войти
+            </button>
+             <!-- Кнопка "Регистрация" -->
+            <button id="tab-register"
+              class="flex-1 py-2 rounded text-sm font-medium transition-colors tab-inactive">
+              Регистрация
+            </button>
+        </div>
+        
+        <!-- Основная форма аутентификации -->
+        <form id="auth-form" class="flex flex-col gap-4">
+            <!-- Поле для имени-->
+            <div id="field-name" class="hidden flex flex-col gap-1">
+                <!-- Подпись к полю -->
+                <label class="text-[#b5bac1] text-xs font-semibold uppercase tracking-wide">Имя</label>
+                <!-- Поле ввода имени -->
+                <input id="input-name" type="text" placeholder="Ваше имя"
+                class="bg-[#1e1f22] text-white rounded px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#5865f2]" />
+            </div>
+            
+            <!-- Поле для email -->
+            <div class="flex flex-col gap-1">
+                <!-- Подпись к полю -->
+                <label class="text-[#b5bac1] text-xs font-semibold uppercase tracking-wide">Email</label>
+                <!-- Поле ввода email-->
+                <input id="input-email" type="email" placeholder="example@mail.com"
+                class="bg-[#1e1f22] text-white rounded px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#5865f2]" />
+            </div>
+            
+           <!-- Поле для пароля -->
+           <div class="flex flex-col gap-1">
+               <!-- Подпись к полю -->
+               <label class="text-[#b5bac1] text-xs font-semibold uppercase tracking-wide">Пароль</label>
+               <!-- Поле ввода пароля-->
+               <input id="input-password" type="password" placeholder="**********"
+                class="bg-[#1e1f22] text-white rounded px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#5865f2]" />
+            </div>
+
+            <!-- Блок для вывода ошибок аутентификации -->
+            <p id="auth-error" class="text-red-400 text-sm hidden"></p>
+
+            <!-- Кнопка отправки формы -->
+            <button type="submit"
+                class="bg-[#5865f2] hover:bg-[#4752c4] text-white font-semibold py-2 rounded transition-colors">
+                Войти
+            </button>
+
+        </form>
+
+    </div>
+
+  <!-- Подключение JavaScript файлов -->
+  <script src="/js/api.js"></script>   <!-- Модуль для работы с API (запросы к серверу) -->
+  <script src="/js/ui.js"></script>    <!-- Модуль для обновления интерфейса -->
+  <script src="/js/main.js"></script>  <!-- Главный модуль, связывающий всё вместе -->
+</body>
+
+</html>

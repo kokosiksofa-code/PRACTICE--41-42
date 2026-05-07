@@ -1,0 +1,66 @@
+// Настройка генератора Prisma Client 
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma" // Путь для сгенерированного клиента
+}
+
+// Подключение к PostgreSQL 
+datasource db {
+  provider = "postgresql"
+}
+
+// Модель пользователя (таблица users)
+model User {
+  id         String   @id @default(uuid()) // Уникальный ID пользователя
+  supabaseId String   @unique @map("supabase_id") // ID из Supabase аутентификации
+  email      String   @unique // Email (уникальный)
+  name       String? // Имя (опционально)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  messages    Message[] // Связь "один ко многим" с сообщениями
+  roomMembers RoomMember[] // Связь с членством в комнатах
+
+  @@map("users") // Имя таблицы в БД
+}
+
+// Модель сообщения (таблица messages)
+model Message {
+  id        String   @id @default(uuid())
+  content   String // Текст сообщения
+  senderId  String   @map("sender_id") // ID отправителя
+  roomId    String   @map("room_id") // ID комнаты
+  createdAt DateTime @default(now()) @map("created_at")
+
+  sender User @relation(fields: [senderId], references: [id], onDelete: Cascade) // Внешний ключ на User
+  room   Room @relation(fields: [roomId], references: [id], onDelete: Cascade) // Внешний ключ на Room
+
+  @@index([roomId]) // Индекс для быстрого поиска по комнате
+  @@index([senderId]) // Индекс для поиска по отправителю
+  @@map("messages")
+}
+
+// Модель комнаты чата (таблица rooms)
+model Room {
+  id        String   @id @default(uuid())
+  name      String   @unique // Название комнаты (уникальное)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  messages    Message[] // Сообщения в комнате
+  roomMembers RoomMember[] // Участники комнаты
+
+  @@map("rooms")
+}
+
+// Модель членства в комнате (таблица room_members) - связь многие ко многим
+model RoomMember {
+  userId   String   @map("user_id") // ID пользователя
+  roomId   String   @map("room_id") // ID комнаты
+  joinedAt DateTime @default(now()) @map("joined_at") // Дата вступления
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roomId]) // Составной первичный ключ (пользователь+комната)
+  @@map("room_members")
+}
